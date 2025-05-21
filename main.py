@@ -1,4 +1,4 @@
-# !/usr/bin/env python3
+#!/usr/bin/env python3
 # ------------------------------------- #
 # Made by GorouFlex                     #
 # Ported from MrLolf/HoneygainAutoClaim #
@@ -47,13 +47,19 @@ if os.getenv('GITHUB_ACTIONS') == 'true':
     user_response = requests.get(user_url, timeout=10000)
     original_response = requests.get(original_url, timeout=10000)
     if user_response.status_code == 200 and original_response.status_code == 200:
-        user_commit = user_response.json()[0]['sha']
-        original_commit = original_response.json()[0]['sha']
-        if user_commit == original_commit:
-            print(f"{colors.OKGREEN}Your repo is up-to-date with the original repo{colors.ENDC}")
+        user_data = user_response.json()
+        original_data = original_response.json()
+
+        if user_data and original_data: # Check if lists are not empty
+            user_commit = user_data[0]['sha']
+            original_commit = original_data[0]['sha']
+            if user_commit == original_commit:
+                print(f"{colors.OKGREEN}Your repo is up-to-date with the original repo{colors.ENDC}")
+            else:
+                print(f"{colors.WARNING}Your repo is not up-to-date with the original repo{colors.ENDC}")
+                print(f"{colors.FAIL}Please update your repo to the latest commit{colors.ENDC}{colors.FAIL}to get new updates and bug fixes{colors.ENDC}")
         else:
-            print(f"{colors.WARNING}Your repo is not up-to-date with the original repo{colors.ENDC}")
-            print(f"{colors.FAIL}Please update your repo to the latest commit{colors.ENDC}{colors.FAIL}to get new updates and bug fixes{colors.ENDC}")
+            print(f"{colors.FAIL}❌ Error: Could not retrieve commit information for one or both repositories. The response might be empty.{colors.ENDC}")
     else:
         print(f"{colors.FAIL}❌ Error code 4: Failed to fetch commit information{colors.ENDC}")
 else:
@@ -121,7 +127,7 @@ def create_config() -> None:
     cfg.set('Url', 'achievements', 'https://dashboard.honeygain.com/api/v1/achievements/')
     cfg.set('Url', 'achievement_claim', 'https://dashboard.honeygain.com/api/v1/achievements/claim')
     cfg.set('Url', 'referrals', 'https://dashboard.honeygain.com/api/v1/referrals?items_per_page'
-                                '=100')
+                                 '=100')
     cfg.set('Url', 'referral_claim', 'https://dashboard.honeygain.com/api/v1/referrals/')
     with open(config_path, 'w', encoding='utf-8') as configfile:
         configfile.truncate(0)
@@ -170,7 +176,7 @@ def get_login(cfg: ConfigParser) -> dict[str, str]:
             user: dict[str, str] = {'token': token}
         else:
             user: dict[str, str] = {'email': cfg.get('User', 'email'),
-                                    'password': cfg.get('User', 'password')}
+                                     'password': cfg.get('User', 'password')}
     except configparser.NoOptionError:
         create_config()
     except configparser.NoSectionError:
@@ -182,10 +188,10 @@ def get_settings(cfg: ConfigParser) -> dict[str, bool]:
     settings_dict: dict[str, bool] = {}
     try:
         settings_dict: dict[str, bool] = {'lucky_pot': cfg.getboolean('Settings', 'Lucky Pot'),
-                                          'achievements_bool': cfg.getboolean('Settings',
-                                                                              'Achievements'),
-                                          'referrals_bool': cfg.getboolean('Settings', 'Referrals')
-                                          }
+                                         'achievements_bool': cfg.getboolean('Settings',
+                                                                             'Achievements'),
+                                         'referrals_bool': cfg.getboolean('Settings', 'Referrals')
+                                         }
     except configparser.NoOptionError:
         create_config()
     except configparser.NoSectionError:
@@ -232,11 +238,6 @@ def token_valid(token: dict, s: requests.Session) -> bool:
 
         if 'data' in dashboard:
             return True
-
-    print(f"{colors.WARNING}--------- Traceback log ---------{colors.ENDC}\n{colors.FAIL}❌ Error code 2: Wrong login credentials,please enter the right ones\nPlease refer to: https://github.com/gorouflex/Sandy/blob/main/Docs/HoneygainPot/Debug.md for more information\nOr create an Issue on GitHub if it still doesn't work for you.{colors.ENDC}")
-    print(f"{colors.FAIL}Closing HoneygainPot due to false login credentials ❌{colors.ENDC}")
-    return False
-
 
     print(f"{colors.WARNING}--------- Traceback log ---------{colors.ENDC}\n{colors.FAIL}❌ Error code 2: Wrong login credentials,please enter the right ones\nPlease refer to: https://github.com/gorouflex/Sandy/blob/main/Docs/HoneygainPot/Debug.md for more information\nOr create an Issue on GitHub if it still doesn't work for you.{colors.ENDC}")
     print(f"{colors.FAIL}Closing HoneygainPot due to false login credentials ❌{colors.ENDC}")
@@ -364,9 +365,9 @@ if __name__ == '__main__':
     main()
     if os.getenv('GITHUB_ACTIONS') == 'true':
        try:
-         shutil.rmtree(config_folder)
-         print(f"{colors.WARNING}Cleaning up...{colors.ENDC}")
+           shutil.rmtree(config_folder)
+           print(f"{colors.WARNING}Cleaning up...{colors.ENDC}")
        except:
-         print(f"{colors.FAIL}Cannot delete Config folder, check if any programs are using it or not?{colors.ENDC}")
-         exit(-1)
+           print(f"{colors.FAIL}Cannot delete Config folder, check if any programs are using it or not?{colors.ENDC}")
+           exit(-1)
     print(f"{colors.OKGREEN}Closing HoneygainPot ✅{colors.ENDC}")
