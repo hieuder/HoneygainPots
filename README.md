@@ -45,7 +45,7 @@
 </p>
 
 #
-
+[![CL](https://github.com/hieuder/HoneygainPots/actions/workflows/cl.yml/badge.svg)](https://github.com/hieuder/HoneygainPots/actions/workflows/cl.yml)
 ### [Honeygain](https://r.honeygain.me/BADBO762DE) is a service that allows you to earn **passive income** by **sharing** your **internet** connection with businesses for web statistics, price comparison, and other verified business processes.
 
 ### Belongs to the Sandy Project
